@@ -7,8 +7,8 @@ export async function wavToMp3(wavBuffer: ArrayBuffer): Promise<ArrayBuffer> {
 
 async function wavToMp3Client(wavBuffer: ArrayBuffer): Promise<ArrayBuffer> {
   const ffmpeg = await getClientFfmpeg();
-  const inputName = `input-${crypto.randomUUID()}.wav`;
-  const outputName = `output-${crypto.randomUUID()}.mp3`;
+  const inputName = `input-${Math.random().toString(36).slice(2)}.wav`;
+  const outputName = `output-${Math.random().toString(36).slice(2)}.mp3`;
 
   ffmpeg.writeFile(inputName, new Uint8Array(wavBuffer));
   await ffmpeg.exec(["-i", inputName, "-b:a", "192k", outputName]);
