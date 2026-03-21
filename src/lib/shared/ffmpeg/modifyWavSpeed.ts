@@ -18,8 +18,8 @@ async function modifyWavSpeedClient(
   velocity: number,
 ): Promise<ArrayBuffer> {
   const ffmpeg = await getClientFfmpeg();
-  const inputName = `input-${Math.random().toString(36).slice(2)}.wav`;
-  const outputName = `output-${Math.random().toString(36).slice(2)}.mp3`;
+  const inputName = `input-${Date.now()}-${Math.random().toString(36).slice(2)}.wav`;
+  const outputName = `output-${Date.now()}-${Math.random().toString(36).slice(2)}.mp3`;
 
   ffmpeg.writeFile(inputName, new Uint8Array(wavBuffer));
 
@@ -27,6 +27,8 @@ async function modifyWavSpeedClient(
   await ffmpeg.exec(["-i", inputName, "-filter:a", filter, outputName]);
 
   const data = await ffmpeg.readFile(outputName, "binary");
+  await ffmpeg.deleteFile(inputName).catch(() => {});
+  await ffmpeg.deleteFile(outputName).catch(() => {});
   if (typeof data === "string") throw new Error("Se esperaba datos binarios");
   return data.buffer as ArrayBuffer;
 }

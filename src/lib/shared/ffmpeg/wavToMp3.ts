@@ -7,13 +7,15 @@ export async function wavToMp3(wavBuffer: ArrayBuffer): Promise<ArrayBuffer> {
 
 async function wavToMp3Client(wavBuffer: ArrayBuffer): Promise<ArrayBuffer> {
   const ffmpeg = await getClientFfmpeg();
-  const inputName = `input-${Math.random().toString(36).slice(2)}.wav`;
-  const outputName = `output-${Math.random().toString(36).slice(2)}.mp3`;
+  const inputName = `input-${Date.now()}-${Math.random().toString(36).slice(2)}.wav`;
+  const outputName = `output-${Date.now()}-${Math.random().toString(36).slice(2)}.mp3`;
 
   ffmpeg.writeFile(inputName, new Uint8Array(wavBuffer));
   await ffmpeg.exec(["-i", inputName, "-b:a", "192k", outputName]);
 
   const data = await ffmpeg.readFile(outputName, "binary");
+  await ffmpeg.deleteFile(inputName).catch(() => {});
+  await ffmpeg.deleteFile(outputName).catch(() => {});
   if (typeof data === "string") throw new Error("Expected binary data");
 
   return data.buffer as ArrayBuffer;
